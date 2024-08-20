@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// npx prisma migrate dev para atualizar os dados no banco
+model User {
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  password  String
+  name      String
+  phone     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  enderecos Endereco[]
+}
+
+model Endereco {
+  id           Int            @id @default(autoincrement())
+  userId       Int
+  rua          String
+  numero       String
+  bairro       String
+  cidade       String
+  estado       String
+  cep          String
+  latitude     Float
+  longitude    Float
+  createdAt    DateTime        @default(now())
+  
+  user         User            @relation(fields: [userId], references: [id])
+  churrascaria Churrascaria?   @relation(fields: [churrascariaId], references: [id])
+  churrascariaId Int?
+  mercado      Mercado?        @relation(fields: [mercadoId], references: [id])
+  mercadoId    Int?
+}
+
+
+model Churrascaria {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String?
+  imageUrl    String
+  location    String
+  rating      Float?       // Campo para avaliação
+  phoneNumber String?      
+  website     String?      
+
+  enderecos   Endereco[]
+}
+
+
+model Mercado {
+  id           Int          @id @default(autoincrement())
+  name         String
+  description  String?
+  imageUrl     String
+  location     String
+  openingHours String?      
+  phoneNumber  String?      
+  fazEntregas  Boolean      // Campo para indicar se o mercado faz entregas
+
+  enderecos    Endereco[]
+  carnes       Carne[]      
+}
+
+model Carne {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float    
+  weight      Float    
+  marketId    Int
+  market      Mercado  @relation(fields: [marketId], references: [id])
+}
+
+model KitDeChurrasco {
+  id            Int      @id @default(autoincrement())
+  name          String
+  description   String?
+  price         Float
+  imageUrl String
+  createdAt     DateTime @default(now())
+}
