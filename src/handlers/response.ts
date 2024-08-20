@@ -12,4 +12,3 @@ export const sendSucess = (
   })
 }
 
-//   sendSuccess(res, data, 'Data retrieved successfully');

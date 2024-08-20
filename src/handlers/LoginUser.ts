@@ -14,7 +14,6 @@ export const loginUser = async (
   try {
     const { email, password } = req.body
 
-    // Verifique se o email e o password estão presentes
     if (!email || !password) {
       throw new ValidationError("Email and password are required")
     }
