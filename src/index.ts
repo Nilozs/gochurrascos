@@ -11,23 +11,23 @@ import { updateUserById } from "./handlers/UploadUser"
 import { errorHandler } from "./middleware/midleware"
 
 const prisma = new PrismaClient()
-const app = express()
+export const app = express()
 
-const allowedOrigins = ["'http://localhost:8080", "'http://localhost:3000"]
+const allowedOrigins = ["http://localhost:8080", "http://localhost:3000"] 
 app.use(
   cors({
     origin: function (origin, callback) {
       if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true)
+      } else {
+        callback(new Error("não permitido pelo cors"))
       }
-      return callback(new Error("não permitido pelo cors"))
     },
-    credentials: true
+    credentials: true,
   }),
 )
 
 app.use(express.json())
-
 app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
@@ -39,12 +39,10 @@ app.get("/api", (req: Request, res: Response) => {
   res.send("API Funcionando")
 })
 
+// handler dos usuarios
 app.post("/api/create-users", createUser)
-
 app.get("/api/user/:id", getUserById)
-
 app.delete("/api/user/:id", deleteUserById)
-
 app.put("/api/user/:id", updateUserById)
 app.post("/api/login", loginUser)
 

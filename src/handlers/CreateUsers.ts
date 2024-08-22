@@ -12,7 +12,7 @@ export const createUser = async (req: Request, res: Response) => {
     const { email, password, name, phone } = req.body
 
     if (!email || !password || !name || !phone) {
-      throw new ValidationError("Error de validação veja os campos requeridos")
+      throw new ValidationError("Erro de validação: veja os campos requeridos")
     }
 
     const saltRounds = 10
@@ -31,6 +31,10 @@ export const createUser = async (req: Request, res: Response) => {
 
     sendSucess(res, { user: newUser, token }, "Usuário criado com sucesso")
   } catch (error) {
-    throw new ValidationError("Erro na validação dos dados enviados")
+    if (error instanceof ValidationError) {
+      res.status(400).json({ error: error.message })
+    } else {
+      res.status(500).json({ error: "Erro interno do servidor" })
+    }
   }
 }
