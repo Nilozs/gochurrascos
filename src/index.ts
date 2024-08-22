@@ -9,11 +9,12 @@ import { getUserById } from "./handlers/GetUsersById"
 import { loginUser } from "./handlers/LoginUser"
 import { updateUserById } from "./handlers/UploadUser"
 import { errorHandler } from "./middleware/midleware"
+import { listUsers } from "./handlers/GetAllUsers"
 
 const prisma = new PrismaClient()
 export const app = express()
 
-const allowedOrigins = ["http://localhost:8080", "http://localhost:3000"] 
+const allowedOrigins = ["http://localhost:8080", "http://localhost:3000"]
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -45,6 +46,7 @@ app.get("/api/user/:id", getUserById)
 app.delete("/api/user/:id", deleteUserById)
 app.put("/api/user/:id", updateUserById)
 app.post("/api/login", loginUser)
+app.get("/api/users", listUsers)
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
