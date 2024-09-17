@@ -46,7 +46,7 @@ model Churrascaria {
   description String?
   imageUrl    String
   location    String
-  rating      Float?       // Campo para avaliação
+  rating      Float?       
   phoneNumber String?      
   website     String?      
 
@@ -62,7 +62,7 @@ model Mercado {
   location     String
   openingHours String?      
   phoneNumber  String?      
-  fazEntregas  Boolean      // Campo para indicar se o mercado faz entregas
+  fazEntregas  Boolean  
 
   enderecos    Endereco[]
   carnes       Carne[]      
