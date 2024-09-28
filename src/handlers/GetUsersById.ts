@@ -9,19 +9,23 @@ export const getUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
+    if (isNaN(parseInt(id))) {
+      throw new ValidationError("ID inválido fornecido")
+    }
+
     const user = await prisma.user.findUnique({
-      where: { id: parseInt(id, 30) },
+      where: { id: parseInt(id, 10) },
       include: {
         enderecos: true,
       },
     })
 
     if (!user) {
-      throw new NotFoundError("usuario não encontrado")
+      throw new NotFoundError("Usuário não encontrado")
     }
 
-    sendSucess(res, user, "usuario encontrado com sucesso")
+    sendSucess(res, user, "Usuário encontrado com sucesso")
   } catch (error) {
-    throw new NotFoundError("usuario não encontrado verifique o id")
+    res.status(404).json({ message: "Erro ao buscar usuário" })
   }
 }
