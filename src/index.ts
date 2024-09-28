@@ -14,7 +14,10 @@ import { listUsers } from "./handlers/GetAllUsers"
 const prisma = new PrismaClient()
 export const app = express()
 
-const allowedOrigins = ["https://gochurrascos.onrender.com", "https://mestre-do-churrasco.vercel.app/"]
+const allowedOrigins = [
+  "https://gochurrascos.onrender.com",
+  "https://mestre-do-churrasco.vercel.app/",
+]
 app.use(
   cors({
     origin: function (origin, callback) {
@@ -33,6 +36,15 @@ app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.urlencoded({ extended: true }))
+app.use((req, res, next) => {
+  res.header(
+    "Access-Control-Allow-Origin",
+    "https://mestre-do-churrasco.vercel.app",
+  )
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
+  res.header("Access-Control-Allow-Headers", "Content-Type")
+  next()
+})
 
 app.use(errorHandler)
 
