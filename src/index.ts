@@ -36,6 +36,8 @@ app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.urlencoded({ extended: true }))
+app.options('*', cors()); 
+
 app.use((req, res, next) => {
   res.header(
     "Access-Control-Allow-Origin",
@@ -53,12 +55,12 @@ app.get("/api", (req: Request, res: Response) => {
 })
 
 // handler dos usuarios
-app.post("/api/create-users", createUser)
-app.get("/api/user/:id", getUserById)
-app.delete("/api/user/:id", deleteUserById)
-app.put("/api/user/:id", updateUserById)
-app.post("/api/login", loginUser)
-app.get("/api/users", listUsers)
+app.post("/api/create-users", createUser , cors())
+app.get("/api/user/:id", getUserById , cors())
+app.delete("/api/user/:id", deleteUserById , cors())
+app.put("/api/user/:id", updateUserById , cors())
+app.post("/api/login", loginUser , cors())
+app.get("/api/users", listUsers , cors())
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
