@@ -14,7 +14,7 @@ import { listUsers } from "./handlers/GetAllUsers"
 const prisma = new PrismaClient()
 export const app = express()
 
-const allowedOrigins = ["http://localhost:8080/api", "http://localhost:5173"]
+const allowedOrigins = ["https://gochurrascos.onrender.com", "https://mestre-do-churrasco.vercel.app/"]
 app.use(
   cors({
     origin: function (origin, callback) {
