@@ -1,66 +1,72 @@
 import { PrismaClient } from "@prisma/client"
 import bodyParser from "body-parser"
 import compression from "compression"
-import cors from "cors"
-import express, { Request, Response } from "express"
+import express, { NextFunction, Request, Response } from "express"
 import { createUser } from "./handlers/CreateUsers"
 import { deleteUserById } from "./handlers/DeleteUser"
+import { listUsers } from "./handlers/GetAllUsers"
 import { getUserById } from "./handlers/GetUsersById"
 import { loginUser } from "./handlers/LoginUser"
 import { updateUserById } from "./handlers/UploadUser"
 import { errorHandler } from "./middleware/midleware"
-import { listUsers } from "./handlers/GetAllUsers"
 
+// Instância do Prisma
 const prisma = new PrismaClient()
 export const app = express()
 
-const allowedOrigins = [
-  "https://gochurrascos.onrender.com",
-  "https://mestre-do-churrasco.vercel.app/",
-]
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(new Error("não permitido pelo cors"))
-      }
-    },
-    credentials: true,
-  }),
-)
+// Ajuste da tipagem para garantir que o 'next' seja sempre obrigatório
+type HandlerFunction = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => Promise<void> | void
 
+const allowCors =
+  (fn: HandlerFunction) =>
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.setHeader("Access-Control-Allow-Credentials", "true")
+    res.setHeader("Access-Control-Allow-Origin", "*") // Ajuste aqui se quiser permitir origens específicas
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+    )
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version",
+    )
+    if (req.method === "OPTIONS") {
+      res.status(200).end()
+      return
+    }
+    try {
+      await fn(req, res, next)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+// Configurações globais do express
 app.use(express.json())
 app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.urlencoded({ extended: true }))
-app.options('*', cors()); 
 
-app.use((req, res, next) => {
-  res.header(
-    "Access-Control-Allow-Origin",
-    "https://mestre-do-churrasco.vercel.app",
-  )
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
-  res.header("Access-Control-Allow-Headers", "Content-Type")
-  next()
-})
-
+// Middleware de tratamento de erros
 app.use(errorHandler)
 
+// Rota de teste
 app.get("/api", (req: Request, res: Response) => {
   res.send("API Funcionando")
 })
 
-// handler dos usuarios
-app.post("/api/create-users", createUser , cors())
-app.get("/api/user/:id", getUserById , cors())
-app.delete("/api/user/:id", deleteUserById , cors())
-app.put("/api/user/:id", updateUserById , cors())
-app.post("/api/login", loginUser , cors())
-app.get("/api/users", listUsers , cors())
+// Handlers de usuários, agora usando `allowCors`
+app.post("/api/create-users", allowCors(createUser))
+app.get("/api/user/:id", allowCors(getUserById))
+app.delete("/api/user/:id", allowCors(deleteUserById))
+app.put("/api/user/:id", allowCors(updateUserById))
+app.post("/api/login", allowCors(loginUser))
+app.get("/api/users", allowCors(listUsers))
 
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => {
